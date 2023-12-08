@@ -381,7 +381,6 @@ export default WritePage;
 
 const TextSpace = styled.div`
   width: 390px;
-  height: 912px;
   background-color: var(--Bg_color);
 `;
 

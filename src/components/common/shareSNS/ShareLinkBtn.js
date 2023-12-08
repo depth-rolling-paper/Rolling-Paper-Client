@@ -18,7 +18,7 @@ export default ShareLinkBtn;
 
 const ShareBtn = styled.button`
   height: 29px;
-  width: 62px;
+  padding: 0 7px;
   gap: 6px;
   border: none;
   border-radius: 4px;
