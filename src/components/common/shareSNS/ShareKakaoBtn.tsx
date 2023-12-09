@@ -3,9 +3,10 @@ import ShareKakao from './ShareKakao';
 
 type LinkType = {
   link: string;
+  setCopyClick: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ShareKakaoBtn: React.FC<LinkType> = ({ link }) => {
+const ShareKakaoBtn: React.FC<LinkType> = ({ link, setCopyClick }) => {
   const [shareButton, setShareButton] = useState(false);
 
   useEffect(() => {
@@ -22,7 +23,14 @@ const ShareKakaoBtn: React.FC<LinkType> = ({ link }) => {
       document.body.removeChild(script);
     };
   }, []);
-  return <div>{shareButton === true ? <ShareKakao link={link} /> : null}</div>;
+
+  return (
+    <div>
+      {shareButton === true ? (
+        <ShareKakao link={link} setCopyClick={setCopyClick} />
+      ) : null}
+    </div>
+  );
 };
 
 export default ShareKakaoBtn;

@@ -64,7 +64,7 @@ const CreateRoomPage: React.FC = () => {
 
     if (show) {
       if (time !== '' && roomName !== '') {
-        setLink('https://github.com/depth-rolling-paper');
+        setLink('https://rollingpaper.netlify.app/room/1');
         setCreateRoom(true);
       }
     }
@@ -163,7 +163,7 @@ const CreateRoomPage: React.FC = () => {
             setCopyClick={setCopyClick}
             setCopyMsg={setCopyMsg}
           />
-          <ShareKakaoBtn link={link} />
+          <ShareKakaoBtn link={link} setCopyClick={setCopyClick} />
         </LinkCopy>
         <div
           style={{

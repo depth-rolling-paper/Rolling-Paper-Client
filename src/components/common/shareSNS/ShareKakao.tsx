@@ -11,47 +11,48 @@ declare global {
 
 type LinkType = {
   link: string;
+  setCopyClick: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ShareKakao: React.FC<LinkType> = ({ link }) => {
+const ShareKakao: React.FC<LinkType> = ({ link, setCopyClick }) => {
   const url = link;
 
   useEffect(() => {
-    ShareKakao();
+    if (window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init(process.env.REACT_APP_KAKAO_KEY);
+    }
   }, []);
 
   const ShareKakao = () => {
-    if (window.Kakao) {
-      const kakao = window.Kakao;
-      if (!kakao.isInitialized()) {
-        kakao.init(process.env.REACT_APP_KAKAO_KEY);
-      }
-      kakao.Share.createDefaultButton({
-        container: '#kakao-link-btn',
+    if (window.Kakao && window.Kakao.isInitialized()) {
+      window.Kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
           title: '롤링페이퍼',
-          description: '너도 들어와',
-          imageUrl: '',
+          description:
+            '종이와 펜 없이 온라인에서 간편하게\n롤링페이퍼를 주고 받아 보세요!',
+          imageUrl: 'https://i.ibb.co/wLKgLMD/logo.png',
           link: {
-            webUrl: url,
-            mobileWebUrl: url,
+            mobileWebUrl: 'https://rollingpaper.netlify.app',
+            webUrl: 'https://rollingpaper.netlify.app',
           },
         },
         buttons: [
           {
-            title: '나도 롤링페이퍼 방 만들기',
+            title: '친구가 기다리고 있어요',
             link: {
+              mobileWebUrl: url,
               webUrl: url,
             },
           },
         ],
       });
+      setCopyClick(true);
     }
   };
 
   return (
-    <ShareBtn id="kakao-link-btn">
+    <ShareBtn id="kakao-link-btn" onClick={ShareKakao}>
       <Kakao />
     </ShareBtn>
   );

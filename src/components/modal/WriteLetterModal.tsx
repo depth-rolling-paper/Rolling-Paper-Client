@@ -105,7 +105,7 @@ const WriteLetterModal: React.FC<WriteType> = ({
               style={{
                 fontFamily: 'KNPSKkomi-Regular00',
                 fontSize: 16,
-                paddingTop: 5,
+                paddingTop: 7,
               }}
             >
               Aa
@@ -118,7 +118,11 @@ const WriteLetterModal: React.FC<WriteType> = ({
             </button>
             <button
               onClick={() => handleFontClick('Nanum Pen Script')}
-              style={{ fontFamily: 'Nanum Pen Script', fontSize: 19 }}
+              style={{
+                fontFamily: 'Nanum Pen Script',
+                fontSize: 19,
+                paddingTop: 3,
+              }}
             >
               Aa
             </button>
@@ -217,5 +221,8 @@ const FontDiv = styled.div`
     color: var(--Secondary);
     margin-left: 5px;
     margin-right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 `;

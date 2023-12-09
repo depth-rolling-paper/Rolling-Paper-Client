@@ -347,9 +347,15 @@ const WritePage: React.FC = () => {
         </div>
       </TextSpace>
       <FixedDiv>
-        <Sticker onClick={handleImageClick} />
+        {changeButton !== 1 ? <Sticker onClick={handleImageClick} /> : null}
         {changeButton === 1 ? (
-          <Button $margintop={17.94} onClick={() => setIsModalOpen(true)}>
+          <Button
+            $margintop={17.94}
+            style={{
+              width: 310,
+            }}
+            onClick={() => setIsModalOpen(true)}
+          >
             작성하기
           </Button>
         ) : changeButton === 2 ? (
@@ -403,7 +409,7 @@ const NameSpace = styled.div`
 
 const FixedDiv = styled.div`
   position: fixed;
-  bottom: 78px;
+  bottom: 10px;
 `;
 
 const NextDiv = styled.div`

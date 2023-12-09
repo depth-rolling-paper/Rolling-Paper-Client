@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { ModalBlackOut } from '../../App.style';
+import { ReactComponent as CloseB } from '../../images/CloseB.svg';
 
 type ActionConfirmModalProps = {
   isOpen: boolean;
@@ -20,11 +21,16 @@ const ActionConfirmModal: React.FC<ActionConfirmModalProps> = ({
     <ModalBlackOut style={{ display: isOpen ? 'block' : 'none' }}>
       <ModalDiv>
         {modalState ? (
-          <Text $font="--Bold-Large-font">
-            롤링페이퍼 이미지가
-            <br />
-            성공적으로 저장되었어요!
-          </Text>
+          <div>
+            <CloseBtn onClick={() => closeModal()}>
+              <CloseB />
+            </CloseBtn>
+            <Text $font="--Bold-Large-font">
+              롤링페이퍼 이미지가
+              <br />
+              성공적으로 저장되었어요!
+            </Text>
+          </div>
         ) : (
           <Text $font="--Bold-Medium-font">
             롤링페이퍼를 이미지로 저장하셨나요?
@@ -104,4 +110,19 @@ const Button = styled.button<{ $background: string; $color: string }>`
   color: var(${props => props.$color});
   font: var(--Bold-Medium-font);
   margin: 12px 9px;
+`;
+
+const CloseBtn = styled.button`
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  border: none;
+  background: none;
+
+  svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 `;
