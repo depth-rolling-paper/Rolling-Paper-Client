@@ -80,7 +80,7 @@ const WriteLetterModal: React.FC<WriteType> = ({
           <FontDiv>
             <button
               onClick={() => handleFontClick('Nanum Gothic')}
-              style={{ fontFamily: 'Nanum Gothic' }}
+              style={{ fontFamily: 'Nanum Gothic', fontSize: 15 }}
             >
               Aa
             </button>
@@ -105,7 +105,7 @@ const WriteLetterModal: React.FC<WriteType> = ({
               style={{
                 fontFamily: 'KNPSKkomi-Regular00',
                 fontSize: 16,
-                paddingTop: 7,
+                paddingTop: 4,
               }}
             >
               Aa
