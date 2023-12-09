@@ -105,7 +105,6 @@ const WriteLetterModal: React.FC<WriteType> = ({
               style={{
                 fontFamily: 'KNPSKkomi-Regular00',
                 fontSize: 16,
-                paddingTop: 4,
               }}
             >
               Aa
