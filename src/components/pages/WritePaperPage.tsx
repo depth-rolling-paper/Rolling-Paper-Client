@@ -368,7 +368,7 @@ const WritePage: React.FC = () => {
         ) : (
           <NextDiv>
             <button onClick={() => setIsModalOpen(true)}>수정하기</button>
-            <button onClick={saveInfoHandler}>보러가기</button>
+            <button onClick={saveInfoHandler}>작성 완료하기</button>
           </NextDiv>
         )}
       </FixedDiv>
