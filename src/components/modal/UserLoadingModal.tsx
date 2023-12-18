@@ -5,7 +5,8 @@ import { ReactComponent as PersonFill } from '../../images/PersonFill.svg';
 import { ReactComponent as Person } from '../../images/Person.svg';
 import { ModalBlackOut } from '../../App.style';
 import axios from 'axios';
-import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 
 type UserLoadingModalProps = {
   url: string;
@@ -28,41 +29,36 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
   const [personCount, setPersonCount] = useState(personFill);
 
   useEffect(() => {
-    const client = new Client({
-      brokerURL: 'ws://www.rollingpaper.p-e.kr:8080/ws',
-      debug: function (str) {
-        console.log(str);
-      },
-    });
+    const socket = new SockJS('http://www.rollingpaper.p-e.kr:8080/ws');
+    const stompClient = Stomp.over(socket);
 
     // 연결이 성공하면 실행되는 콜백
-    client.onConnect = function (frame) {
-      console.log('성공');
-      console.log('Connected: ' + frame);
+    stompClient.connect(
+      {},
+      function (frame: string) {
+        console.log('Connected: ' + frame);
 
-      // 서버로부터 메시지를 받는 구독 설정
-      client.subscribe(`/topic/${url}`, function (message) {
-        console.log(message.body);
-        const personCount = Number(message.body);
-        if (message.body === url) {
-          NextPages();
-        } else {
-          setPersonCount(personCount);
-        }
-      });
-    };
-
-    // 연결이 실패하면 실행되는 콜백
-    client.onStompError = function (frame) {
-      console.log('STOMP Error: ' + frame);
-    };
-
-    // STOMP 클라이언트 연결 시작
-    client.activate();
+        // 서버로부터 메시지를 받는 구독 설정
+        stompClient.subscribe(`/topic/${url}`, function (message) {
+          const personCount = Number(message.body);
+          if (message.body === url) {
+            NextPages();
+          } else {
+            setPersonCount(personCount);
+          }
+        });
+      },
+      function (error: string) {
+        // 연결이 실패하면 실행되는 콜백
+        console.log('STOMP Error: ' + error);
+      },
+    );
 
     // 컴포넌트가 언마운트될 때 STOMP 클라이언트 연결 종료
     return () => {
-      client.deactivate();
+      if (stompClient !== null) {
+        stompClient.disconnect();
+      }
     };
   }, []);
 
