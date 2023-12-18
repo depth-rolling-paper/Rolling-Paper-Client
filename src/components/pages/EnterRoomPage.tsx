@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   Container,
@@ -8,14 +8,30 @@ import {
   Button,
 } from '../../App.style';
 import { ReactComponent as Logo } from '../../images/Rolling_Paper_Classic_S.svg';
-import PersonModal from '../modal/UserLoadingModal';
+import UserLoadingModal from '../modal/UserLoadingModal';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const EnterRoomPage: React.FC = () => {
   const [name, setName] = useState(''); //입력한 이름
-  const count = 6; //현재 들어와 있는 사람 수
   const [loading, setLoading] = useState(false); //Loading 창 띄울지 여부
   const [errorMsg, setErrorMsg] = useState('');
   const MAX_LENGTH = 6; //이름 글자수 제한
+  const location = useLocation();
+  const { state } = useLocation();
+  const url = location.pathname.replace('/room/', '');
+  const [userId, setUserId] = useState(0);
+  const [type, setType] = useState(''); //MANAGER or NORMAL
+  const [person, setPerson] = useState(0); //함께 할 사람 수
+  const [personFill, setPersonFill] = useState(0); //들어와 있는 사람 수
+
+  useEffect(() => {
+    if (state) {
+      setType(state);
+    } else {
+      setType('NORMAL');
+    }
+  }, []);
 
   //이름 글자수 계산 & 내용 저장
   const onInputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,17 +45,41 @@ const EnterRoomPage: React.FC = () => {
 
   //롤링페이퍼 쓰러 가기 버튼
   const rollingPaperHandler = () => {
-    if (name === '이름') {
-      //이름이라는 이름이 이미 있다고 가정
-      setErrorMsg('이미 사용중인 이름입니다.');
-    }
-    if (count >= 7) {
-      //7명까지 가능한 방이라고 가정
-      setErrorMsg('이 방은 더 이상 입장이 불가능해요. 인원수를 확인해주세요');
-    }
-    if (name !== '이름' && count < 7) {
-      setLoading(true);
-    }
+    axios
+      .get(
+        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/users/${name}/${url}`,
+      )
+      .then(res => {
+        if (res.data.canUse) {
+          userCreate();
+        } else {
+          setErrorMsg(res.data.message);
+        }
+      })
+      .catch(error => {
+        setErrorMsg(error.response.data.message);
+      });
+  };
+
+  const userCreate = () => {
+    axios
+      .post(
+        'http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/users',
+        {
+          userName: name,
+          userType: type,
+          waitingRoomUrl: url,
+        },
+      )
+      .then(res => {
+        setUserId(res.data.id);
+        setPerson(res.data.limitUserCount);
+        setPersonFill(res.data.currentUserCount);
+        setLoading(true);
+      })
+      .catch(error => {
+        setErrorMsg(error.response.data.message);
+      });
   };
 
   return (
@@ -76,7 +116,16 @@ const EnterRoomPage: React.FC = () => {
       >
         롤링페이퍼 쓰러 가기
       </Button>
-      {loading ? <PersonModal /> : null}
+      {loading ? (
+        <UserLoadingModal
+          url={url}
+          userId={userId}
+          name={name}
+          type={type}
+          person={person}
+          personFill={personFill}
+        />
+      ) : null}
     </Container>
   );
 };

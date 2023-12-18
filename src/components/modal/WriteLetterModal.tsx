@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ModalBlackOut, Button } from '../../App.style';
 import { ReactComponent as Close } from '../../images/Close.svg';
@@ -14,6 +14,7 @@ type WriteType = {
   }) => void;
   person: number;
   personFill: number;
+  reset: boolean;
 };
 
 const WriteLetterModal: React.FC<WriteType> = ({
@@ -22,11 +23,17 @@ const WriteLetterModal: React.FC<WriteType> = ({
   onRegister,
   person,
   personFill,
+  reset,
 }) => {
   const [text, setText] = useState('');
   const [font, setFont] = useState('Nanum Gothic'); //기본 폰트
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const MAX_LENGTH = 100; //글자수 제한
+
+  useEffect(() => {
+    setText('');
+    setFont('');
+  }, [reset]);
 
   const handleFontClick = (selectedFont: React.SetStateAction<string>) => {
     setFont(selectedFont);

@@ -4,29 +4,96 @@ import { useNavigate } from 'react-router-dom';
 import { ReactComponent as PersonFill } from '../../images/PersonFill.svg';
 import { ReactComponent as Person } from '../../images/Person.svg';
 import { ModalBlackOut } from '../../App.style';
+import axios from 'axios';
+import { Client } from '@stomp/stompjs';
 
-const UserLoadingModal: React.FC = () => {
-  const [user, setUser] = useState('host'); //host, guest
-  const [person, setPerson] = useState(15); //함께 할 사람 수
-  const [personFill, setPersonFill] = useState(3); //들어와 있는 사람 수
+type UserLoadingModalProps = {
+  url: string;
+  userId: number;
+  name: string;
+  type: string;
+  person: number;
+  personFill: number;
+};
+
+const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
+  url,
+  userId,
+  name,
+  type,
+  person,
+  personFill,
+}) => {
   const navigate = useNavigate();
+  const [personCount, setPersonCount] = useState(personFill);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      //2초 지난 후에 들어온 사람 수가 7명이 채워지도록
-      setUser('host');
-      setPerson(7);
-      setPersonFill(7);
-    }, 2000);
+    const client = new Client({
+      brokerURL:
+        'ws://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/ws',
+      debug: function (str) {
+        console.log(str);
+      },
+    });
 
+    // 연결이 성공하면 실행되는 콜백
+    client.onConnect = function (frame) {
+      console.log('성공');
+      console.log('Connected: ' + frame);
+
+      // 서버로부터 메시지를 받는 구독 설정
+      client.subscribe(`/topic/${url}`, function (message) {
+        console.log(message.body);
+        const personCount = Number(message.body);
+        if (message.body === url) {
+          NextPages();
+        } else {
+          setPersonCount(personCount);
+        }
+      });
+    };
+
+    // 연결이 실패하면 실행되는 콜백
+    client.onStompError = function (frame) {
+      console.log('STOMP Error: ' + frame);
+    };
+
+    // STOMP 클라이언트 연결 시작
+    client.activate();
+
+    // 컴포넌트가 언마운트될 때 STOMP 클라이언트 연결 종료
     return () => {
-      clearTimeout(timer);
+      client.deactivate();
     };
   }, []);
 
-  const startRollHandler = () => {
-    if (person === personFill) {
-      navigate('/room/1/1');
+  const startRollHandler = async () => {
+    if (person === personCount) {
+      try {
+        await axios.post(
+          `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/rooms/${url}`,
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const NextPages = async () => {
+    try {
+      const getResponse = await axios.get(
+        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/users/exclusion/${userId}/${url}`,
+      );
+      navigate(`/room/${url}/write`, {
+        state: {
+          userData: getResponse.data.users,
+          url: url,
+          userId: userId,
+          name: name,
+        },
+      });
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -34,17 +101,17 @@ const UserLoadingModal: React.FC = () => {
     <ModalBlackOut>
       <ModalDiv>
         <Count>
-          {personFill}/{person}
+          {personCount}/{person}
         </Count>
         <ImageDiv>
-          {Array.from({ length: personFill }, (_, index) => (
+          {Array.from({ length: personCount }, (_, index) => (
             <PersonFill key={index} />
           ))}
-          {Array.from({ length: person - personFill }, (_, index) => (
+          {Array.from({ length: person - personCount }, (_, index) => (
             <Person key={index} />
           ))}
         </ImageDiv>
-        {user === 'host' ? (
+        {type === 'MANAGER' ? (
           <Text>
             설정한 시작 시간까지
             <br />
@@ -52,12 +119,12 @@ const UserLoadingModal: React.FC = () => {
           </Text>
         ) : (
           <Text>
-            7명 모두 모인후 방 입장이 가능합니다!
+            {person}명 모두 모인후 방 입장이 가능합니다!
             <br />
             조금만 기다려주세요...
           </Text>
         )}
-        {user === 'host' ? (
+        {type === 'MANAGER' ? (
           <Button onClick={startRollHandler}>롤링페이퍼 바로 시작하기</Button>
         ) : null}
       </ModalDiv>

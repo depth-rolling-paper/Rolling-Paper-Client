@@ -3,19 +3,35 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { ModalBlackOut } from '../../App.style';
 import { ReactComponent as CloseB } from '../../images/CloseB.svg';
+import axios from 'axios';
 
 type ActionConfirmModalProps = {
   isOpen: boolean;
   closeModal: () => void;
   modalState: boolean;
+  userId: number;
 };
 
 const ActionConfirmModal: React.FC<ActionConfirmModalProps> = ({
   isOpen,
   closeModal,
   modalState,
+  userId,
 }) => {
   const navigate = useNavigate();
+
+  const exitRoomHandler = () => {
+    axios
+      .delete(
+        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/users/${userId}`,
+      )
+      .then(() => {
+        navigate('/');
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
 
   return (
     <ModalBlackOut style={{ display: isOpen ? 'block' : 'none' }}>
@@ -45,7 +61,7 @@ const ActionConfirmModal: React.FC<ActionConfirmModalProps> = ({
             <Button
               $background="--modal-button"
               $color="--contents-content"
-              onClick={() => navigate('/')}
+              onClick={exitRoomHandler}
             >
               방 나가기
             </Button>
@@ -62,7 +78,7 @@ const ActionConfirmModal: React.FC<ActionConfirmModalProps> = ({
             <Button
               $background="--modal-button"
               $color="--contents-content"
-              onClick={() => navigate('/')}
+              onClick={exitRoomHandler}
             >
               방 나가기
             </Button>

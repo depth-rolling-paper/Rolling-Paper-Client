@@ -6,7 +6,7 @@ import { ReactComponent as Logo } from '../../images/Rolling_Paper_Classic_S.svg
 import styled from 'styled-components';
 import ShareImgBtn from '../common/shareSNS/ShareImgBtn';
 import Toast from '../common/Toast';
-import DeliveryModal from '../modal/ActionConfirmModal';
+import ActionConfirmModal from '../modal/ActionConfirmModal';
 import LoadingModal from '../modal/WaitWritingModal';
 
 import sticker1 from '../../images/sticker/sticker1.png';
@@ -33,8 +33,9 @@ import sticker21 from '../../images/sticker/sticker21.png';
 import sticker22 from '../../images/sticker/sticker22.png';
 import sticker23 from '../../images/sticker/sticker23.png';
 
-import textdata from '../../dummyData/textdata.json';
-import stickerdata from '../../dummyData/stickerdata.json';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { Client } from '@stomp/stompjs';
 
 type StickerType = {
   image: HTMLImageElement;
@@ -43,7 +44,28 @@ type StickerType = {
   y: number;
 };
 
+type TextInfoTypes = {
+  fontFamily: string;
+  location_x: number;
+  location_y: number;
+  rotation: number;
+  width: number;
+  height: number;
+  scaleX: number;
+  scaleY: number;
+  text: string;
+};
+
+type ImageRollingPapersType = {
+  id: number;
+  rollingPaperType: string;
+  imageName: string;
+  sizeX: number;
+  sizeY: number;
+};
+
 const DeliverPaperPage: React.FC = () => {
+  const { state } = useLocation();
   const stageRef = useRef<Konva.Stage | null>(null);
   const layerRef = useRef<Konva.Layer | null>(null);
   const [stickers, setStickers] = useState<StickerType[]>([]);
@@ -51,16 +73,57 @@ const DeliverPaperPage: React.FC = () => {
   const [toastState, setToastState] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); //모달창 여부
   const [modalState, setModalState] = useState(true); //이미지 저장 성공 모달 : true, 방 나가기 모달 : false
-  const [loading, setLoading] = useState(true); //Loading 창 띄울지 여부
+  const [loading, setLoading] = useState(!state.emptyRoom); //Loading 창 띄울지 여부
+
+  const [imageRollingPapers, setImageRollingPapers] = useState<
+    ImageRollingPapersType[]
+  >([]);
+
+  useEffect(() => {
+    const client = new Client({
+      brokerURL:
+        'ws://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/ws',
+      debug: function (str) {
+        console.log(str);
+      },
+    });
+
+    // 연결이 성공하면 실행되는 콜백
+    client.onConnect = function (frame) {
+      console.log('성공');
+      console.log('Connected: ' + frame);
+
+      // 서버로부터 메시지를 받는 구독 설정
+      client.subscribe(`/topic/${state.url}`, function (message) {
+        if (Number(message.body) === 0) {
+          console.log(message.body);
+          setLoading(false);
+        }
+      });
+    };
+
+    // 연결이 실패하면 실행되는 콜백
+    client.onStompError = function (frame) {
+      console.log('STOMP Error: ' + frame);
+    };
+
+    // STOMP 클라이언트 연결 시작
+    client.activate();
+
+    // 컴포넌트가 언마운트될 때 STOMP 클라이언트 연결 종료
+    return () => {
+      client.deactivate();
+    };
+  }, []);
 
   //textdata를 기반으로 텍스트 객체 생성
-  const createTexts = async () => {
+  const createTexts = async (rollingPapers: TextInfoTypes[]) => {
     const newTexts: Konva.Text[] = await Promise.all(
-      textdata.map(async textProperties => {
+      rollingPapers.map(async (textProperties: TextInfoTypes) => {
         await window.document.fonts.load(`12px "${textProperties.fontFamily}"`);
         const text: Konva.Text = new Konva.Text({
-          x: textProperties.x,
-          y: textProperties.y,
+          x: textProperties.location_x,
+          y: textProperties.location_y,
           rotation: textProperties.rotation,
           width: textProperties.width,
           height: textProperties.height,
@@ -77,19 +140,19 @@ const DeliverPaperPage: React.FC = () => {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      //2초 지난 후에 사라지도록
-      setLoading(false);
-    }, 2000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  });
-
-  useEffect(() => {
     if (loading === false) {
-      createTexts();
+      axios
+        .get(
+          `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/rolling-papers/${state.userId}`,
+        )
+        .then(async res => {
+          setImageRollingPapers(res.data.imageRollingPapers);
+
+          await createTexts(res.data.rollingPapers);
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
   }, [loading]);
 
@@ -106,9 +169,9 @@ const DeliverPaperPage: React.FC = () => {
       stage.add(layer);
 
       //기존에 추가된 텍스트 객체 제거
-      layer.children.forEach((child: { destroy: () => void }) => {
+      layer.children.forEach((child: { remove: () => void }) => {
         if (child instanceof Konva.Text) {
-          child.destroy();
+          child.remove();
         }
       });
 
@@ -146,14 +209,14 @@ const DeliverPaperPage: React.FC = () => {
       };
 
       //기존에 있던 스티커 출력
-      stickerdata.forEach(stickerProperties => {
+      imageRollingPapers.forEach(stickerProperties => {
         const newImage = new window.Image();
-        newImage.src = imageMapping[stickerProperties.image];
+        newImage.src = imageMapping[stickerProperties.imageName];
         newImage.onload = function () {
           const img = new Konva.Image({
             image: newImage,
-            x: stickerProperties.x,
-            y: stickerProperties.y,
+            x: stickerProperties.sizeX,
+            y: stickerProperties.sizeY,
           });
 
           layer.add(img);
@@ -172,7 +235,7 @@ const DeliverPaperPage: React.FC = () => {
       <TextSpace id="image">
         <NameSpace>
           <span style={{ float: 'left' }}>To.</span>
-          <span>오늘의 글쓴이</span>
+          <span>{state.userName}</span>
           <hr />
         </NameSpace>
         <div id="container">
@@ -222,10 +285,11 @@ const DeliverPaperPage: React.FC = () => {
           text="저장을 실패했습니다 다시 시도해 주세요."
         />
       ) : null}
-      <DeliveryModal
+      <ActionConfirmModal
         isOpen={isModalOpen}
         closeModal={() => setIsModalOpen(false)}
         modalState={modalState}
+        userId={state.userId}
       />
       {loading ? <LoadingModal /> : null}
     </Container>

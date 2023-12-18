@@ -14,9 +14,9 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/create-room" element={<CreateRoomPage />} />
-          <Route path="/room/:id" element={<EnterRoomPage />} />
-          <Route path="/room/:id/:write" element={<WritePaperPage />} />
-          <Route path="/room/:id/deliver" element={<DeliverPaperPage />} />
+          <Route path="/room/:url" element={<EnterRoomPage />} />
+          <Route path="/room/:url/write" element={<WritePaperPage />} />
+          <Route path="/room/:url/deliver" element={<DeliverPaperPage />} />
         </Routes>
       </BrowserRouter>
     </AppContainer>

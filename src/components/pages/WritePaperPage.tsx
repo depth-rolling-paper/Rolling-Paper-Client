@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Konva from 'konva';
 import { Stage, Layer, Image } from 'react-konva';
 import { Container, Button } from '../../App.style';
@@ -7,6 +7,7 @@ import { ReactComponent as Logo } from '../../images/Rolling_Paper_Classic_S.svg
 import styled from 'styled-components';
 import Sticker from '../common/Sticker';
 import WriteModal from '../modal/WriteLetterModal';
+import axios from 'axios';
 
 import sticker1 from '../../images/sticker/sticker1.png';
 import sticker2 from '../../images/sticker/sticker2.png';
@@ -32,9 +33,6 @@ import sticker21 from '../../images/sticker/sticker21.png';
 import sticker22 from '../../images/sticker/sticker22.png';
 import sticker23 from '../../images/sticker/sticker23.png';
 
-import textdata from '../../dummyData/textdata.json';
-import stickerdata from '../../dummyData/stickerdata.json';
-
 type StickerType = {
   image: HTMLImageElement;
   imageName: string;
@@ -43,14 +41,15 @@ type StickerType = {
 };
 
 type StickerInfoType = {
-  image: string;
-  x: number;
-  y: number;
+  rollingPaperType: string;
+  imageName: string;
+  sizeX: number;
+  sizeY: number;
 };
 
 type TextInfoType = {
-  x: number;
-  y: number;
+  location_x: number;
+  location_y: number;
   rotation: number;
   width: number;
   height: number;
@@ -58,24 +57,52 @@ type TextInfoType = {
   scaleY: number;
   text: string;
   fontFamily: string;
+  rollingPaperType: string;
+};
+
+type TextInfoTypes = {
+  fontFamily: string;
+  location_x: number;
+  location_y: number;
+  rotation: number;
+  width: number;
+  height: number;
+  scaleX: number;
+  scaleY: number;
+  text: string;
+};
+
+type ImageRollingPapersType = {
+  id: number;
+  rollingPaperType: string;
+  imageName: string;
+  sizeX: number;
+  sizeY: number;
 };
 
 const WritePage: React.FC = () => {
   const stageRef = useRef<Konva.Stage | null>(null);
   const layerRef = useRef<Konva.Layer | null>(null);
   const navigate = useNavigate();
+  const { state } = useLocation();
   const [stickers, setStickers] = useState<StickerType[]>([]);
   const [allStickersInfo, setAllStickersInfo] = useState<StickerInfoType[]>([]); //붙인 모든 스티커에 대한 정보 값
   const [texts, setTexts] = useState<Konva.Text[]>([]);
-  const [textInfo, setTextInfo] = useState<TextInfoType[]>([]); //텍스트에 대한 정보 값
+  const [textInfo, setTextInfo] = useState<TextInfoType>(); //텍스트에 대한 정보 값
 
   const [isModalOpen, setIsModalOpen] = useState(false); //모달창 오픈 여부
   const [textValue, setTextValue] = useState(''); //작성한 텍스트
   const [fontFamily, setFontFamily] = useState(''); //설정한 폰트
   const [changeButton, setChangeButton] = useState(1); //1 : 작성하기, 2 : 수정, 넘어가기, 3 : 보러가기
 
-  const [person, setPerson] = useState(6); //해당 방의 전체 유저 수에서 자신을 제외한 수
-  const [personFill, setPersonFill] = useState(1); //현재 유저가 작성한 롤링페이퍼 수
+  const person = state.userData.length; //해당 방의 전체 유저 수에서 자신을 제외한 수
+  const [personFill, setPersonFill] = useState(0); //현재 유저가 작성한 롤링페이퍼 수
+
+  const [imageRollingPapers, setImageRollingPapers] = useState<
+    ImageRollingPapersType[]
+  >([]);
+
+  const [reset, setReset] = useState(false);
 
   const handleRegister = (data: {
     newText: string;
@@ -89,13 +116,13 @@ const WritePage: React.FC = () => {
   };
 
   //textdata를 기반으로 텍스트 객체 생성
-  const createTexts = async () => {
+  const createTexts = async (rollingPapers: TextInfoTypes[]) => {
     const newTexts: Konva.Text[] = await Promise.all(
-      textdata.map(async textProperties => {
+      rollingPapers.map(async (textProperties: TextInfoTypes) => {
         await window.document.fonts.load(`12px "${textProperties.fontFamily}"`);
         const text: Konva.Text = new Konva.Text({
-          x: textProperties.x,
-          y: textProperties.y,
+          x: textProperties.location_x,
+          y: textProperties.location_y,
           rotation: textProperties.rotation,
           width: textProperties.width,
           height: textProperties.height,
@@ -112,8 +139,20 @@ const WritePage: React.FC = () => {
   };
 
   useEffect(() => {
-    createTexts();
-  }, []);
+    axios
+      .get(
+        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/rolling-papers/${state.userData[personFill].id}`,
+      )
+      .then(async res => {
+        setImageRollingPapers(res.data.imageRollingPapers);
+
+        await createTexts(res.data.rollingPapers);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    setReset(false);
+  }, [reset]);
 
   useEffect(() => {
     const stage = new Konva.Stage({
@@ -123,13 +162,14 @@ const WritePage: React.FC = () => {
     });
 
     const layer = layerRef.current;
+
     if (layer) {
       stage.add(layer);
 
       //기존에 추가된 텍스트 객체 제거
-      layer.children.forEach((child: { destroy: () => void }) => {
+      layer.children.forEach((child: { remove: () => void }) => {
         if (child instanceof Konva.Text) {
-          child.destroy();
+          child.remove();
         }
       });
 
@@ -167,14 +207,14 @@ const WritePage: React.FC = () => {
       };
 
       //기존에 있던 스티커 출력
-      stickerdata.forEach(stickerProperties => {
+      imageRollingPapers.forEach(stickerProperties => {
         const newImage = new window.Image();
-        newImage.src = imageMapping[stickerProperties.image];
+        newImage.src = imageMapping[stickerProperties.imageName];
         newImage.onload = function () {
           const img = new Konva.Image({
             image: newImage,
-            x: stickerProperties.x,
-            y: stickerProperties.y,
+            x: stickerProperties.sizeX,
+            y: stickerProperties.sizeY,
           });
 
           layer.add(img);
@@ -201,6 +241,26 @@ const WritePage: React.FC = () => {
         layer.add(tr);
         tr.nodes([group]);
 
+        const updateText = () => {
+          const infos = {
+            location_x: group.x(),
+            location_y: group.y(),
+            rotation: group.rotation(),
+            width: rolltext.width(),
+            height: rolltext.height(),
+            scaleX: group.scaleX(),
+            scaleY: group.scaleY(),
+            text: textValue,
+            fontFamily: fontFamily,
+            rollingPaperType: 'ROLLING_PAPER',
+          };
+
+          setTextInfo(infos);
+          layer.batchDraw();
+        };
+
+        updateText();
+
         group.on('dragmove', () => {
           updateText();
         });
@@ -208,24 +268,6 @@ const WritePage: React.FC = () => {
         group.on('transform', () => {
           updateText();
         });
-
-        const updateText = () => {
-          const infos = [
-            {
-              x: group.x(),
-              y: group.y(),
-              rotation: group.rotation(),
-              width: rolltext.width(),
-              height: rolltext.height(),
-              scaleX: group.scaleX(),
-              scaleY: group.scaleY(),
-              text: textValue,
-              fontFamily: fontFamily,
-            },
-          ];
-          setTextInfo(infos);
-          layer.batchDraw();
-        };
       }
     }
 
@@ -278,9 +320,10 @@ const WritePage: React.FC = () => {
 
       const updatedAllStickersInfo = updatedStickers.map(sticker => {
         return {
-          image: sticker.imageName,
-          x: sticker.x,
-          y: sticker.y,
+          imageName: sticker.imageName,
+          sizeX: sticker.x,
+          sizeY: sticker.y,
+          rollingPaperType: 'IMAGE',
         };
       });
       setAllStickersInfo(updatedAllStickersInfo);
@@ -288,18 +331,79 @@ const WritePage: React.FC = () => {
   };
 
   const saveInfoHandler = () => {
-    setTextInfo(textInfo);
-    setAllStickersInfo(allStickersInfo);
-    if (personFill < person) {
-      //넘어가기 기능
-      setPersonFill(personFill + 1);
-      setPerson(6);
-      navigate(`/room/1/${personFill + 1}`);
-      setChangeButton(1);
-    } else {
-      //마지막 페이지일 때
-      navigate('/room/1/deliver');
-    }
+    const ImageList = allStickersInfo.map(sticker => ({
+      rollingPaperType: 'IMAGE',
+      imageName: sticker.imageName,
+      sizeX: sticker.sizeX,
+      sizeY: sticker.sizeY,
+    }));
+
+    const data = {
+      rollingPaperList: [
+        {
+          location_x: textInfo?.location_x,
+          location_y: textInfo?.location_y,
+          rotation: textInfo?.rotation,
+          width: textInfo?.width,
+          height: textInfo?.height,
+          scaleX: textInfo?.scaleX,
+          scaleY: textInfo?.scaleY,
+          text: textInfo?.text,
+          fontFamily: textInfo?.fontFamily,
+          rollingPaperType: textInfo?.rollingPaperType,
+        },
+        ...ImageList,
+      ],
+    };
+
+    axios
+      .post(
+        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/rolling-papers/${state.userData[personFill].id}`,
+        data,
+      )
+      .then(() => {
+        if (personFill + 1 < person) {
+          //넘어가기 기능
+          setPersonFill(personFill + 1);
+          setTextInfo({
+            location_x: 100,
+            location_y: 100,
+            rotation: 0,
+            width: 0,
+            height: 0,
+            scaleX: 1,
+            scaleY: 1,
+            text: '',
+            fontFamily: 'Nanum Gothic',
+            rollingPaperType: 'ROLLING_PAPER',
+          });
+          setAllStickersInfo([]);
+          setTextValue('');
+          setFontFamily('');
+          setReset(true);
+          setChangeButton(1);
+        } else {
+          //마지막 페이지일 때
+          axios
+            .delete(
+              `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/users/${state.userId}/${state.url}`,
+            )
+            .then(res => {
+              navigate(`/room/${state.url}/deliver`, {
+                state: {
+                  userId: state.userId,
+                  userName: state.name,
+                  url: state.url,
+                  emptyRoom: res.data.emptyRoom,
+                },
+              });
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        }
+      })
+      .catch();
   };
 
   return (
@@ -308,7 +412,7 @@ const WritePage: React.FC = () => {
       <TextSpace id="image">
         <NameSpace>
           <span style={{ float: 'left' }}>To.</span>
-          <span>오늘의 글쓴이</span>
+          <span>{state.userData[personFill].userName}</span>
           <hr />
         </NameSpace>
         <div id="container">
@@ -332,9 +436,10 @@ const WritePage: React.FC = () => {
                     const updatedAllStickersInfo = updatedStickers.map(
                       sticker => {
                         return {
-                          image: sticker.imageName,
-                          x: sticker.x,
-                          y: sticker.y,
+                          imageName: sticker.imageName,
+                          sizeX: sticker.x,
+                          sizeY: sticker.y,
+                          rollingPaperType: 'IMAGE',
                         };
                       },
                     );
@@ -362,7 +467,7 @@ const WritePage: React.FC = () => {
           <NextDiv>
             <button onClick={() => setIsModalOpen(true)}>수정하기</button>
             <button onClick={saveInfoHandler}>
-              넘어가기 ({personFill}/{person})
+              넘어가기 ({personFill + 1}/{person})
             </button>
           </NextDiv>
         ) : (
@@ -378,6 +483,7 @@ const WritePage: React.FC = () => {
         onRegister={handleRegister}
         person={person}
         personFill={personFill}
+        reset={reset}
       />
     </Container>
   );

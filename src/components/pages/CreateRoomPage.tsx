@@ -14,6 +14,7 @@ import { ReactComponent as Minus } from '../../images/Minus.svg';
 import ShareKakaoBtn from '../common/shareSNS/ShareKakaoBtn';
 import ShareLinkBtn from '../common/shareSNS/ShareLinkBtn';
 import Toast from '../common/Toast';
+import axios from 'axios';
 
 const CreateRoomPage: React.FC = () => {
   const [roomName, setRoomName] = useState(''); //방 이름
@@ -27,6 +28,7 @@ const CreateRoomPage: React.FC = () => {
   const [createRoom, setCreateRoom] = useState(false);
   const [copyClick, setCopyClick] = useState(false);
   const [copyMsg, setCopyMsg] = useState(0); //0 초기, 1 성공, 2 에러
+  const [gotoRoom, setGotoRoom] = useState('');
   const navigate = useNavigate();
   const MAX_LENGTH = 10; //방 이름 글자수 제한
 
@@ -64,8 +66,23 @@ const CreateRoomPage: React.FC = () => {
 
     if (show) {
       if (time !== '' && roomName !== '') {
-        setLink('https://rollingpaper.netlify.app/room/1');
-        setCreateRoom(true);
+        axios
+          .post(
+            'http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/waiting-rooms',
+            {
+              waiting_room_name: roomName,
+              limit_user_num: count,
+              start_time_minute: Number(time),
+            },
+          )
+          .then(res => {
+            setLink('https://rollingpaper.netlify.app/room/' + res.data.url);
+            setGotoRoom(res.data.url);
+            setCreateRoom(true);
+          })
+          .catch(error => {
+            console.error(error);
+          });
       }
     }
   };
@@ -74,7 +91,7 @@ const CreateRoomPage: React.FC = () => {
   const clickRoomHandler = () => {
     if (copyClick) {
       setCopyMsg(1);
-      navigate('/room/1');
+      navigate(`/room/${gotoRoom}`, { state: 'MANAGER' });
     } else {
       setCopyMsg(2);
     }
@@ -152,7 +169,11 @@ const CreateRoomPage: React.FC = () => {
         <Error $visibility={timeMsg ? 'visible' : 'hidden'}>
           입장 가능 시간을 설정해주세요
         </Error>
-        <Button $margintop={28} onClick={createRoomHandler}>
+        <Button
+          $margintop={28}
+          onClick={createRoomHandler}
+          disabled={createRoom}
+        >
           롤링페이퍼 방 만들기
         </Button>
         <LinkCopy $visibility={createRoom ? 'visible' : 'hidden'}>

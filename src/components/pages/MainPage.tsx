@@ -9,6 +9,7 @@ import {
   Error,
 } from '../../App.style';
 import { ReactComponent as Logo } from '../../images/Rolling_Paper_Classic.svg';
+import axios from 'axios';
 
 const MainPage: React.FC = () => {
   const [link, setLink] = useState(''); //입력한 값 저장
@@ -16,12 +17,22 @@ const MainPage: React.FC = () => {
   const navigate = useNavigate();
 
   const checkLinkHandler = () => {
-    if (link === '안녕') {
-      setCheckLink(false);
-      navigate('/room/1');
-    } else {
-      setCheckLink(true);
-    }
+    const url = link.replace('https://rollingpaper.netlify.app/room/', '');
+    axios
+      .get(
+        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/waiting-rooms/${url}`,
+      )
+      .then(res => {
+        if (res.data.canJoin) {
+          setCheckLink(false);
+          navigate(`/room/${url}`);
+        } else {
+          setCheckLink(true);
+        }
+      })
+      .catch(() => {
+        setCheckLink(true);
+      });
   };
 
   return (
