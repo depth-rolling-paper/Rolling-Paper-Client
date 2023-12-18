@@ -29,7 +29,7 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
   const [personCount, setPersonCount] = useState(personFill);
 
   useEffect(() => {
-    const socket = new SockJS('http://www.rollingpaper.p-e.kr:8080/ws');
+    const socket = new SockJS('https://www.rollingpaper.p-e.kr:8080/ws');
     const stompClient = Stomp.over(socket);
 
     // 연결이 성공하면 실행되는 콜백
