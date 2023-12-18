@@ -141,7 +141,7 @@ const WritePage: React.FC = () => {
   useEffect(() => {
     axios
       .get(
-        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/rolling-papers/${state.userData[personFill].id}`,
+        `https://www.rollingpaper.p-e.kr:8080/rolling-papers/${state.userData[personFill].id}`,
       )
       .then(async res => {
         setImageRollingPapers(res.data.imageRollingPapers);
@@ -358,7 +358,7 @@ const WritePage: React.FC = () => {
 
     axios
       .post(
-        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/rolling-papers/${state.userData[personFill].id}`,
+        `https://www.rollingpaper.p-e.kr:8080/rolling-papers/${state.userData[personFill].id}`,
         data,
       )
       .then(() => {
@@ -386,7 +386,7 @@ const WritePage: React.FC = () => {
           //마지막 페이지일 때
           axios
             .delete(
-              `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/users/${state.userId}/${state.url}`,
+              `https://www.rollingpaper.p-e.kr:8080/users/${state.userId}/${state.url}`,
             )
             .then(res => {
               navigate(`/room/${state.url}/deliver`, {

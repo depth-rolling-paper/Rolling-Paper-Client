@@ -46,9 +46,7 @@ const EnterRoomPage: React.FC = () => {
   //롤링페이퍼 쓰러 가기 버튼
   const rollingPaperHandler = () => {
     axios
-      .get(
-        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/users/${name}/${url}`,
-      )
+      .get(`https://www.rollingpaper.p-e.kr:8080/users/${name}/${url}`)
       .then(res => {
         if (res.data.canUse) {
           userCreate();
@@ -63,14 +61,11 @@ const EnterRoomPage: React.FC = () => {
 
   const userCreate = () => {
     axios
-      .post(
-        'http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/users',
-        {
-          userName: name,
-          userType: type,
-          waitingRoomUrl: url,
-        },
-      )
+      .post('https://www.rollingpaper.p-e.kr:8080/users', {
+        userName: name,
+        userType: type,
+        waitingRoomUrl: url,
+      })
       .then(res => {
         setUserId(res.data.id);
         setPerson(res.data.limitUserCount);

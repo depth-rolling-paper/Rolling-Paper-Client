@@ -81,8 +81,7 @@ const DeliverPaperPage: React.FC = () => {
 
   useEffect(() => {
     const client = new Client({
-      brokerURL:
-        'ws://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/ws',
+      brokerURL: 'ws://www.rollingpaper.p-e.kr:8080/ws',
       debug: function (str) {
         console.log(str);
       },
@@ -143,7 +142,7 @@ const DeliverPaperPage: React.FC = () => {
     if (loading === false) {
       axios
         .get(
-          `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/rolling-papers/${state.userId}`,
+          `https://www.rollingpaper.p-e.kr:8080/rolling-papers/${state.userId}`,
         )
         .then(async res => {
           setImageRollingPapers(res.data.imageRollingPapers);

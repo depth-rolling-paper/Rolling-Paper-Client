@@ -22,9 +22,7 @@ const ActionConfirmModal: React.FC<ActionConfirmModalProps> = ({
 
   const exitRoomHandler = () => {
     axios
-      .delete(
-        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/users/${userId}`,
-      )
+      .delete(`https://www.rollingpaper.p-e.kr:8080/users/${userId}`)
       .then(() => {
         navigate('/');
       })

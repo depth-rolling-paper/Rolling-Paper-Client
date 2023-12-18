@@ -19,9 +19,7 @@ const MainPage: React.FC = () => {
   const checkLinkHandler = () => {
     const url = link.replace('https://rollingpaper.netlify.app/room/', '');
     axios
-      .get(
-        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/waiting-rooms/${url}`,
-      )
+      .get(`https://www.rollingpaper.p-e.kr:8080/waiting-rooms/${url}`)
       .then(res => {
         if (res.data.canJoin) {
           setCheckLink(false);

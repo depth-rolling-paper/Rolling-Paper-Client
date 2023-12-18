@@ -67,14 +67,11 @@ const CreateRoomPage: React.FC = () => {
     if (show) {
       if (time !== '' && roomName !== '') {
         axios
-          .post(
-            'http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/waiting-rooms',
-            {
-              waiting_room_name: roomName,
-              limit_user_num: count,
-              start_time_minute: Number(time),
-            },
-          )
+          .post('https://www.rollingpaper.p-e.kr:8080/waiting-rooms', {
+            waiting_room_name: roomName,
+            limit_user_num: count,
+            start_time_minute: Number(time),
+          })
           .then(res => {
             setLink('https://rollingpaper.netlify.app/room/' + res.data.url);
             setGotoRoom(res.data.url);

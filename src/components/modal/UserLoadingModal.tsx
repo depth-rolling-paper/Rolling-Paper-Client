@@ -29,8 +29,7 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
 
   useEffect(() => {
     const client = new Client({
-      brokerURL:
-        'ws://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/ws',
+      brokerURL: 'ws://www.rollingpaper.p-e.kr:8080/ws',
       debug: function (str) {
         console.log(str);
       },
@@ -70,9 +69,7 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
   const startRollHandler = async () => {
     if (person === personCount) {
       try {
-        await axios.post(
-          `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/rooms/${url}`,
-        );
+        await axios.post(`https://www.rollingpaper.p-e.kr:8080/rooms/${url}`);
       } catch (error) {
         console.error(error);
       }
@@ -82,7 +79,7 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
   const NextPages = async () => {
     try {
       const getResponse = await axios.get(
-        `http://ec2-43-201-158-20.ap-northeast-2.compute.amazonaws.com:8080/users/exclusion/${userId}/${url}`,
+        `https://www.rollingpaper.p-e.kr:8080/users/exclusion/${userId}/${url}`,
       );
       navigate(`/room/${url}/write`, {
         state: {
