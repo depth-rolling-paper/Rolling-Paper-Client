@@ -261,12 +261,31 @@ const WritePage: React.FC = () => {
 
         updateText();
 
-        group.on('dragmove', () => {
-          updateText();
-        });
+        const events = [
+          'mousedown',
+          'mouseup',
+          'mouseover',
+          'mouseout',
+          'mousemove',
+          'click',
+          'dblclick',
+          'touchstart',
+          'touchend',
+          'touchmove',
+          'dragstart',
+          'dragmove',
+          'dragend',
+          'transform',
+          'transformstart',
+          'transformend',
+          'contextmenu',
+          'wheel',
+        ];
 
-        group.on('transform', () => {
-          updateText();
+        events.forEach(event => {
+          group.on(event, () => {
+            updateText();
+          });
         });
       }
     }
