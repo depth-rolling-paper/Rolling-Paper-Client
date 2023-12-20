@@ -38,6 +38,7 @@ type StickerType = {
   imageName: string;
   x: number;
   y: number;
+  width: number;
 };
 
 type StickerInfoType = {
@@ -330,6 +331,7 @@ const WritePage: React.FC = () => {
         imageName: imageNames[stickerSrc],
         x: 10,
         y: 10,
+        width: 200,
       });
     };
 
@@ -342,6 +344,7 @@ const WritePage: React.FC = () => {
           imageName: sticker.imageName,
           sizeX: sticker.x,
           sizeY: sticker.y,
+          width: 200,
           rollingPaperType: 'IMAGE',
         };
       });
@@ -355,6 +358,7 @@ const WritePage: React.FC = () => {
       imageName: sticker.imageName,
       sizeX: sticker.sizeX,
       sizeY: sticker.sizeY,
+      width: 100,
     }));
 
     const data = {
@@ -450,6 +454,7 @@ const WritePage: React.FC = () => {
                       ...updatedStickers[index],
                       x: e.target.x(),
                       y: e.target.y(),
+                      width: 100,
                     };
                     setStickers(updatedStickers);
                     const updatedAllStickersInfo = updatedStickers.map(
@@ -501,7 +506,7 @@ const WritePage: React.FC = () => {
         closeModal={() => setIsModalOpen(false)}
         onRegister={handleRegister}
         person={person}
-        personFill={personFill}
+        personFill={personFill + 1}
         reset={reset}
       />
     </Container>

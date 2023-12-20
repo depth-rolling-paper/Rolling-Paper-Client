@@ -57,7 +57,7 @@ const MainPage: React.FC = () => {
           $border={checkLink ? '--error' : '--border-base'}
           $placeholdercolor={checkLink ? '--error' : '--border-base'}
           type="text"
-          placeholder="초대받은 링크를 입력해주세요"
+          placeholder="초대받은 링크를 입력해 주세요"
           onChange={event => {
             setLink(event.target.value);
             setCheckLink(false);

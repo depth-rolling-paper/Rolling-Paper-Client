@@ -81,6 +81,7 @@ const WriteLetterModal: React.FC<WriteType> = ({
               value={text}
               spellCheck={false}
               style={{ fontFamily: font }}
+              placeholder="내용을 입력해 주세요"
             />
           </TextDiv>
           <p>{text.length}/100</p>

@@ -98,7 +98,7 @@ const CreateRoomPage: React.FC = () => {
     <Container $paddingtop={16}>
       <Logo />
       <DetailContainer $margintop={35}>
-        <Question $margintop={0} $opacity={1}>
+        <Question $margintop={10} $opacity={1}>
           어떤 사람들과의 롤링페이퍼인가요?
         </Question>
         <TextInput
