@@ -318,6 +318,6 @@ const NameSpace = styled.div`
 
 const FixedDiv = styled.div`
   position: fixed;
-  bottom: 78px;
+  bottom: 10px;
   width: 310px;
 `;

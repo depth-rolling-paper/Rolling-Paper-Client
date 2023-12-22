@@ -97,7 +97,7 @@ const CreateRoomPage: React.FC = () => {
   return (
     <Container $paddingtop={16}>
       <Logo />
-      <DetailContainer $margintop={35}>
+      <DetailContainer $margintop={35} $marginBottom={0}>
         <Question $margintop={10} $opacity={1}>
           어떤 사람들과의 롤링페이퍼인가요?
         </Question>
@@ -201,7 +201,7 @@ const CreateRoomPage: React.FC = () => {
       <Button
         $margintop={31}
         onClick={clickRoomHandler}
-        style={{ opacity: copyClick ? 1 : 0.5 }}
+        style={{ opacity: copyClick ? 1 : 0.5, marginBottom: 83 }}
       >
         방 입장하기
       </Button>

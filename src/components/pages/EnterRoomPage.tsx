@@ -80,7 +80,7 @@ const EnterRoomPage: React.FC = () => {
   return (
     <Container $paddingtop={16}>
       <Logo />
-      <DetailContainer $margintop={185}>
+      <DetailContainer $margintop={185} $marginBottom={0}>
         <Text>
           롤링페이퍼 방에서 사용할 이름을 설정해 주세요
           <br />
@@ -107,6 +107,7 @@ const EnterRoomPage: React.FC = () => {
       <Button
         $margintop={259}
         onClick={rollingPaperHandler}
+        style={{ marginBottom: 83 }}
         disabled={name.length >= 2 && name.length <= 6 ? false : true}
       >
         롤링페이퍼 쓰러 가기

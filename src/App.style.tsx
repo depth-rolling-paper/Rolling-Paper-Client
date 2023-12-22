@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const AppContainer = styled.div`
   margin: 0 auto;
   max-width: 390px;
-  height: 100vh;
+  min-height: 100vh;
   background-color: var(--Bg_color);
 `;
 
@@ -18,8 +18,12 @@ export const Container = styled.div<{ $paddingtop: number }>`
   padding-right: 30px;
 `;
 
-export const DetailContainer = styled.div<{ $margintop: number }>`
+export const DetailContainer = styled.div<{
+  $margintop: number;
+  $marginBottom: number;
+}>`
   margin-top: ${props => props.$margintop}px;
+  margin-bottom: ${props => props.$marginBottom}px;
   padding: 14px 10px 0px;
   width: 100%;
   flex-shrink: 0;
@@ -66,7 +70,9 @@ export const TextInput = styled.input<{
   }
 `;
 
-export const Button = styled.button<{ $margintop: number }>`
+export const Button = styled.button<{
+  $margintop: number;
+}>`
   padding: 19px 64.5px;
   margin-top: ${props => props.$margintop}px;
   margin-bottom: 10px;

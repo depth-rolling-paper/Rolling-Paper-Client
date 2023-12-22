@@ -36,7 +36,7 @@ const MainPage: React.FC = () => {
   return (
     <Container $paddingtop={98}>
       <Logo />
-      <DetailContainer $margintop={70}>
+      <DetailContainer $margintop={70} $marginBottom={0}>
         <Text>
           소중한 사람들과 소중한 마음을 주고 받고 싶으신가요?
           <br />
@@ -46,7 +46,7 @@ const MainPage: React.FC = () => {
           롤링페이퍼 방 만들기
         </Button>
       </DetailContainer>
-      <DetailContainer $margintop={31}>
+      <DetailContainer $margintop={31} $marginBottom={69}>
         <Text>
           롤링페이퍼 방에 초대 받으셨나요?
           <br />
