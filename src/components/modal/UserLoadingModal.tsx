@@ -27,24 +27,24 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
 }) => {
   const navigate = useNavigate();
   const [personCount, setPersonCount] = useState(personFill);
+  const [persons, setPersons] = useState(false);
 
   useEffect(() => {
     const socket = new SockJS('https://www.rollingpaper.p-e.kr:8080/ws');
-    const stompClient = Stomp.over(socket);
+    const stompClient = Stomp.over(() => socket);
 
     // 연결이 성공하면 실행되는 콜백
     stompClient.connect(
       {},
-      function (frame: string) {
-        console.log('Connected: ' + frame);
-
+      function () {
         // 서버로부터 메시지를 받는 구독 설정
         stompClient.subscribe(`/topic/${url}`, function (message) {
-          const personCount = Number(message.body);
           if (message.body === url) {
             NextPages();
+          } else if (message.body === 'true') {
+            setPersons(true);
           } else {
-            setPersonCount(personCount);
+            setPersonCount(Number(message.body));
           }
         });
       },
@@ -63,7 +63,7 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
   }, []);
 
   const startRollHandler = async () => {
-    if (person === personCount) {
+    if (person === personCount || persons) {
       try {
         await axios.post(`https://www.rollingpaper.p-e.kr:8080/rooms/${url}`);
       } catch (error) {
@@ -93,22 +93,46 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
   return (
     <ModalBlackOut>
       <ModalDiv>
-        <Count>
-          {personCount}/{person}
-        </Count>
-        <ImageDiv>
-          {Array.from({ length: personCount }, (_, index) => (
-            <PersonFill key={index} />
-          ))}
-          {Array.from({ length: person - personCount }, (_, index) => (
-            <Person key={index} />
-          ))}
-        </ImageDiv>
+        {persons ? (
+          <>
+            <Count>
+              {personCount}/{personCount}
+            </Count>
+            <ImageDiv>
+              {Array.from({ length: personCount }, (_, index) => (
+                <PersonFill key={index} />
+              ))}
+              {Array.from({ length: personCount - personCount }, (_, index) => (
+                <Person key={index} />
+              ))}
+            </ImageDiv>
+          </>
+        ) : (
+          <>
+            <Count>
+              {personCount}/{person}
+            </Count>
+            <ImageDiv>
+              {Array.from({ length: personCount }, (_, index) => (
+                <PersonFill key={index} />
+              ))}
+              {Array.from({ length: person - personCount }, (_, index) => (
+                <Person key={index} />
+              ))}
+            </ImageDiv>
+          </>
+        )}
         {type === 'MANAGER' ? (
           <Text>
             설정한 시작 시간까지
             <br />
             입장한 유저만 함께할 수 있어요!
+          </Text>
+        ) : persons ? (
+          <Text>
+            {personCount}명 모두 모인후 방 입장이 가능합니다!
+            <br />
+            조금만 기다려주세요...
           </Text>
         ) : (
           <Text>
@@ -118,7 +142,16 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
           </Text>
         )}
         {type === 'MANAGER' ? (
-          <Button onClick={startRollHandler}>롤링페이퍼 바로 시작하기</Button>
+          persons ? (
+            <Button onClick={startRollHandler}>롤링페이퍼 바로 시작하기</Button>
+          ) : (
+            <Button
+              onClick={startRollHandler}
+              disabled={!(person === personCount)}
+            >
+              롤링페이퍼 바로 시작하기
+            </Button>
+          )
         ) : null}
       </ModalDiv>
     </ModalBlackOut>
@@ -170,4 +203,8 @@ const Button = styled.button`
   border: none;
   margin-top: 12px;
   margin-bottom: 12px;
+
+  &:disabled {
+    opacity: 0.3;
+  }
 `;

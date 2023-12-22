@@ -32,10 +32,10 @@ const WriteLetterModal: React.FC<WriteType> = ({
 
   useEffect(() => {
     setText('');
-    setFont('');
+    setFont('Nanum Gothic');
   }, [reset]);
 
-  const handleFontClick = (selectedFont: React.SetStateAction<string>) => {
+  const handleFontClick = (selectedFont: string) => {
     setFont(selectedFont);
   };
 
@@ -88,22 +88,26 @@ const WriteLetterModal: React.FC<WriteType> = ({
           <FontDiv>
             <button
               onClick={() => handleFontClick('Nanum Gothic')}
-              style={{ fontFamily: 'Nanum Gothic', fontSize: 15 }}
+              style={{
+                fontFamily: 'Nanum Gothic',
+                fontSize: 15,
+                backgroundColor:
+                  font === 'Nanum Gothic'
+                    ? 'rgba(0, 0, 0, 0.77)'
+                    : 'var(--border-base-02)',
+              }}
             >
               Aa
             </button>
             <button
               onClick={() => handleFontClick('omyu_pretty')}
-              style={{ fontFamily: 'omyu_pretty', fontSize: 17 }}
-            >
-              Aa
-            </button>
-            <button
-              onClick={() => handleFontClick('SSVeryBadHandwriting')}
               style={{
-                fontFamily: 'SSVeryBadHandwriting',
-                fontSize: 15,
-                paddingTop: 3,
+                fontFamily: 'omyu_pretty',
+                fontSize: 17,
+                backgroundColor:
+                  font === 'omyu_pretty'
+                    ? 'rgba(0, 0, 0, 0.77)'
+                    : 'var(--border-base-02)',
               }}
             >
               Aa
@@ -113,13 +117,24 @@ const WriteLetterModal: React.FC<WriteType> = ({
               style={{
                 fontFamily: 'KNPSKkomi-Regular00',
                 fontSize: 16,
+                backgroundColor:
+                  font === 'KNPSKkomi-Regular00'
+                    ? 'rgba(0, 0, 0, 0.77)'
+                    : 'var(--border-base-02)',
               }}
             >
               Aa
             </button>
             <button
               onClick={() => handleFontClick('HakgyoansimGgooreogiR')}
-              style={{ fontFamily: 'HakgyoansimGgooreogiR', fontSize: 16 }}
+              style={{
+                fontFamily: 'HakgyoansimGgooreogiR',
+                fontSize: 16,
+                backgroundColor:
+                  font === 'HakgyoansimGgooreogiR'
+                    ? 'rgba(0, 0, 0, 0.77)'
+                    : 'var(--border-base-02)',
+              }}
             >
               Aa
             </button>
@@ -129,6 +144,24 @@ const WriteLetterModal: React.FC<WriteType> = ({
                 fontFamily: 'Nanum Pen Script',
                 fontSize: 19,
                 paddingTop: 3,
+                backgroundColor:
+                  font === 'Nanum Pen Script'
+                    ? 'rgba(0, 0, 0, 0.77)'
+                    : 'var(--border-base-02)',
+              }}
+            >
+              Aa
+            </button>
+            <button
+              onClick={() => handleFontClick('SSVeryBadHandwriting')}
+              style={{
+                fontFamily: 'SSVeryBadHandwriting',
+                fontSize: 15,
+                paddingTop: 3,
+                backgroundColor:
+                  font === 'SSVeryBadHandwriting'
+                    ? 'rgba(0, 0, 0, 0.77)'
+                    : 'var(--border-base-02)',
               }}
             >
               Aa
@@ -222,7 +255,6 @@ const FontDiv = styled.div`
   button {
     width: 39.231px;
     height: 39.231px;
-    background-color: var(--border-base-02);
     border: none;
     border-radius: 100px;
     color: var(--Secondary);

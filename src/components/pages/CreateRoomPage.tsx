@@ -120,7 +120,7 @@ const CreateRoomPage: React.FC = () => {
         </Question>
         <CountDiv $opacity={show ? 1 : 0.3}>
           <button
-            disabled={!show || createRoom}
+            disabled={!show || createRoom || count === 2}
             onClick={() => {
               count > 2 ? setCount(count - 1) : setCount(count);
             }}
@@ -129,7 +129,7 @@ const CreateRoomPage: React.FC = () => {
           </button>
           <p>{count}</p>
           <button
-            disabled={!show || createRoom}
+            disabled={!show || createRoom || count === 15}
             onClick={() => {
               count < 15 ? setCount(count + 1) : setCount(count);
             }}
@@ -242,6 +242,11 @@ const CountDiv = styled.div<{ $opacity: number }>`
     border-radius: 4px;
     background-color: var(--border-base-02);
     border: none;
+  }
+
+  button:disabled {
+    cursor: auto;
+    opacity: 0.3;
   }
 
   svg {
