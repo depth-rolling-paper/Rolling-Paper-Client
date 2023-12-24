@@ -83,6 +83,7 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
           url: url,
           userId: userId,
           name: name,
+          roomName: getResponse.data.roomName,
         },
       });
     } catch (error) {

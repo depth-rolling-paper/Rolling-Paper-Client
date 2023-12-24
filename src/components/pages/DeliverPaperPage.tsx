@@ -121,8 +121,6 @@ const DeliverPaperPage: React.FC = () => {
           x: textProperties.location_x,
           y: textProperties.location_y,
           rotation: textProperties.rotation,
-          width: textProperties.width,
-          height: textProperties.height,
           scaleX: textProperties.scaleX,
           scaleY: textProperties.scaleY,
           text: textProperties.text,
@@ -165,9 +163,9 @@ const DeliverPaperPage: React.FC = () => {
       stage.add(layer);
 
       //기존에 추가된 텍스트 객체 제거
-      layer.children.forEach((child: { remove: () => void }) => {
+      layer.children.forEach((child: { destroy: () => void }) => {
         if (child instanceof Konva.Text) {
-          child.remove();
+          child.destroy();
         }
       });
 

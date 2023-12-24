@@ -38,7 +38,6 @@ type StickerType = {
   imageName: string;
   x: number;
   y: number;
-  width: number;
 };
 
 type StickerInfoType = {
@@ -125,8 +124,6 @@ const WritePage: React.FC = () => {
           x: textProperties.location_x,
           y: textProperties.location_y,
           rotation: textProperties.rotation,
-          width: textProperties.width,
-          height: textProperties.height,
           scaleX: textProperties.scaleX,
           scaleY: textProperties.scaleY,
           text: textProperties.text,
@@ -168,9 +165,9 @@ const WritePage: React.FC = () => {
       stage.add(layer);
 
       //기존에 추가된 텍스트 객체 제거
-      layer.children.forEach((child: { remove: () => void }) => {
+      layer.children.forEach((child: { destroy: () => void }) => {
         if (child instanceof Konva.Text) {
-          child.remove();
+          child.destroy();
         }
       });
 
@@ -331,7 +328,6 @@ const WritePage: React.FC = () => {
         imageName: imageNames[stickerSrc],
         x: 10,
         y: 10,
-        width: 200,
       });
     };
 
@@ -344,7 +340,6 @@ const WritePage: React.FC = () => {
           imageName: sticker.imageName,
           sizeX: sticker.x,
           sizeY: sticker.y,
-          width: 200,
           rollingPaperType: 'IMAGE',
         };
       });
@@ -358,7 +353,6 @@ const WritePage: React.FC = () => {
       imageName: sticker.imageName,
       sizeX: sticker.sizeX,
       sizeY: sticker.sizeY,
-      width: 100,
     }));
 
     const data = {
@@ -434,6 +428,7 @@ const WritePage: React.FC = () => {
       <Logo />
       <TextSpace id="image">
         <NameSpace>
+          <p>{state.roomName}</p>
           <span style={{ float: 'left' }}>To.</span>
           <span>{state.userData[personFill].userName}</span>
           <hr />
@@ -454,7 +449,6 @@ const WritePage: React.FC = () => {
                       ...updatedStickers[index],
                       x: e.target.x(),
                       y: e.target.y(),
-                      width: 100,
                     };
                     setStickers(updatedStickers);
                     const updatedAllStickersInfo = updatedStickers.map(
@@ -521,11 +515,18 @@ const TextSpace = styled.div`
 `;
 
 const NameSpace = styled.div`
-  margin-top: 18px;
-  width: 316px;
+  margin-top: 24px;
+  width: 195px;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
+
+  p {
+    color: #000;
+    opacity: 0.5;
+    font: var(--Bold-Small-font);
+    margin-bottom: 9px;
+  }
 
   span {
     color: var(--contents-content);
