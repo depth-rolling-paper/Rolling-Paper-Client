@@ -228,6 +228,7 @@ const DeliverPaperPage: React.FC = () => {
       <Logo />
       <TextSpace id="image">
         <NameSpace>
+          <p>{state.roomName}</p>
           <span style={{ float: 'left' }}>To.</span>
           <span>{state.userName}</span>
           <hr />
@@ -298,11 +299,18 @@ const TextSpace = styled.div`
 `;
 
 const NameSpace = styled.div`
-  margin-top: 18px;
-  width: 316px;
+  margin-top: 24px;
+  width: 195px;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
+
+  p {
+    color: #000;
+    opacity: 0.5;
+    font: var(--Bold-Small-font);
+    margin-bottom: 9px;
+  }
 
   span {
     color: var(--contents-content);

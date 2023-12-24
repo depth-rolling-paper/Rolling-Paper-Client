@@ -412,6 +412,7 @@ const WritePage: React.FC = () => {
                   userName: state.name,
                   url: state.url,
                   emptyRoom: res.data.emptyRoom,
+                  roomName: state.roomName,
                 },
               });
             })
