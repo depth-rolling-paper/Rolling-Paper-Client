@@ -6,7 +6,7 @@ import { ReactComponent as Person } from '../../images/Person.svg';
 import { ModalBlackOut } from '../../App.style';
 import axios from 'axios';
 import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
+import { Stomp, CompatClient } from '@stomp/stompjs';
 
 type UserLoadingModalProps = {
   url: string;
@@ -29,16 +29,21 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
   const [personCount, setPersonCount] = useState(personFill);
   const [persons, setPersons] = useState(false);
 
-  useEffect(() => {
-    const socket = new SockJS('https://www.rollingpaper.p-e.kr:8080/ws');
-    const stompClient = Stomp.over(() => socket);
+  let stompClient: CompatClient | null = null;
 
-    // 연결이 성공하면 실행되는 콜백
+  const connectSocket = () => {
+    const socket = new SockJS('https://www.rollingpaper.p-e.kr:8080/ws');
+
+    socket.onclose = () => {
+      setTimeout(connectSocket, 3000);
+    };
+
+    stompClient = Stomp.over(() => socket);
+
     stompClient.connect(
       {},
-      function () {
-        // 서버로부터 메시지를 받는 구독 설정
-        stompClient.subscribe(`/topic/${url}`, function (message) {
+      () => {
+        stompClient?.subscribe(`/topic/${url}`, message => {
           if (message.body === url) {
             NextPages();
           } else if (message.body === 'true') {
@@ -48,13 +53,16 @@ const UserLoadingModal: React.FC<UserLoadingModalProps> = ({
           }
         });
       },
-      function (error: string) {
-        // 연결이 실패하면 실행되는 콜백
+      (error: string) => {
         console.log('STOMP Error: ' + error);
+        setTimeout(connectSocket, 3000);
       },
     );
+  };
 
-    // 컴포넌트가 언마운트될 때 STOMP 클라이언트 연결 종료
+  useEffect(() => {
+    connectSocket();
+
     return () => {
       if (stompClient !== null) {
         stompClient.disconnect();
