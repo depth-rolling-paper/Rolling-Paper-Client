@@ -80,7 +80,7 @@ const EnterRoomPage: React.FC = () => {
   return (
     <Container $paddingtop={16}>
       <Logo />
-      <DetailContainer $margintop={185} $marginBottom={0}>
+      <DetailContainer $margintop={185} $marginBottom={259}>
         <Text>
           롤링페이퍼 방에서 사용할 이름을 설정해 주세요
           <br />
@@ -104,14 +104,21 @@ const EnterRoomPage: React.FC = () => {
           <Error $visibility="visible">{errorMsg}</Error>
         )}
       </DetailContainer>
-      <Button
-        $margintop={259}
-        onClick={rollingPaperHandler}
-        style={{ marginBottom: 83 }}
-        disabled={name.length >= 2 && name.length <= 6 ? false : true}
-      >
-        롤링페이퍼 쓰러 가기
-      </Button>
+      <TextBtnDiv>
+        <p>
+          롤링페이퍼 입장 전에 브라우저를 닫으면
+          <br />
+          입장이 불가할 수 있어요!
+        </p>
+        <Button
+          $margintop={0}
+          onClick={rollingPaperHandler}
+          style={{ marginBottom: 83 }}
+          disabled={name.length >= 2 && name.length <= 6 ? false : true}
+        >
+          롤링페이퍼 쓰러 가기
+        </Button>
+      </TextBtnDiv>
       {loading ? (
         <UserLoadingModal
           url={url}
@@ -127,6 +134,16 @@ const EnterRoomPage: React.FC = () => {
 };
 
 export default EnterRoomPage;
+
+const TextBtnDiv = styled.div`
+  width: 100%;
+
+  p {
+    color: var(--contents-content);
+    font: var(--paragraph-Medium-font);
+    margin-bottom: 5px;
+  }
+`;
 
 const Text = styled.p`
   color: var(--contents-content);

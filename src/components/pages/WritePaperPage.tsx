@@ -58,6 +58,7 @@ type TextInfoType = {
   text: string;
   fontFamily: string;
   rollingPaperType: string;
+  align: string;
 };
 
 type TextInfoTypes = {
@@ -129,6 +130,7 @@ const WritePage: React.FC = () => {
           text: textProperties.text,
           fontFamily: textProperties.fontFamily,
           fontSize: 12,
+          align: 'center',
         });
         return text;
       }),
@@ -232,6 +234,7 @@ const WritePage: React.FC = () => {
           text: textValue,
           fontSize: 12,
           fontFamily: fontFamily,
+          align: 'center',
         });
         group.add(rolltext);
 
@@ -251,6 +254,7 @@ const WritePage: React.FC = () => {
             text: textValue,
             fontFamily: fontFamily,
             rollingPaperType: 'ROLLING_PAPER',
+            align: 'center',
           };
 
           setTextInfo(infos);
@@ -393,6 +397,7 @@ const WritePage: React.FC = () => {
             text: '',
             fontFamily: 'Nanum Gothic',
             rollingPaperType: 'ROLLING_PAPER',
+            align: 'center',
           });
           setAllStickersInfo([]);
           setTextValue('');
@@ -425,13 +430,15 @@ const WritePage: React.FC = () => {
   };
 
   return (
-    <Container $paddingtop={16}>
-      <Logo />
+    <Container $paddingtop={0}>
       <TextSpace id="image">
+        <Logo />
         <NameSpace>
           <p>{state.roomName}</p>
-          <span style={{ float: 'left' }}>To.</span>
-          <span>{state.userData[personFill].userName}</span>
+          <span style={{ float: 'left', marginLeft: 10 }}>To.</span>
+          <span style={{ marginRight: 10 }}>
+            {state.userData[personFill].userName}
+          </span>
           <hr />
         </NameSpace>
         <div id="container">
@@ -511,13 +518,14 @@ const WritePage: React.FC = () => {
 export default WritePage;
 
 const TextSpace = styled.div`
+  padding-top: 16px;
   width: 390px;
   background-color: var(--Bg_color);
 `;
 
 const NameSpace = styled.div`
-  margin-top: 24px;
-  width: 195px;
+  margin-top: 18px;
+  width: 190px;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
@@ -525,8 +533,8 @@ const NameSpace = styled.div`
   p {
     color: #000;
     opacity: 0.5;
-    font: var(--Bold-Small-font);
-    margin-bottom: 9px;
+    font: var(--Bold-Small-font2);
+    margin-bottom: 13px;
   }
 
   span {

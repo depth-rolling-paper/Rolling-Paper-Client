@@ -160,8 +160,6 @@ const CreateRoomPage: React.FC = () => {
           </option>
           <option value="5">5분 후</option>
           <option value="10">10분 후</option>
-          <option value="30">30분 후</option>
-          <option value="60">1시간 후</option>
         </Select>
         <Error $visibility={timeMsg ? 'visible' : 'hidden'}>
           입장 가능 시간을 설정해주세요

@@ -36,7 +36,7 @@ import sticker23 from '../../images/sticker/sticker23.png';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
+import { Stomp, CompatClient } from '@stomp/stompjs';
 
 type StickerType = {
   image: HTMLImageElement;
@@ -80,31 +80,36 @@ const DeliverPaperPage: React.FC = () => {
     ImageRollingPapersType[]
   >([]);
 
-  useEffect(() => {
-    const socket = new SockJS('https://www.rollingpaper.p-e.kr:8080/ws');
-    const stompClient = Stomp.over(socket);
+  let stompClient: CompatClient | null = null;
 
-    // 연결이 성공하면 실행되는 콜백
+  const connectSocket = () => {
+    const socket = new SockJS('https://www.rollingpaper.p-e.kr:8080/ws');
+
+    socket.onclose = () => {
+      setTimeout(connectSocket, 3000);
+    };
+
+    stompClient = Stomp.over(() => socket);
+
     stompClient.connect(
       {},
-      function (frame: string) {
-        console.log('Connected: ' + frame);
-
-        // 서버로부터 메시지를 받는 구독 설정
-        stompClient.subscribe(`/topic/${state.url}`, function (message) {
+      () => {
+        stompClient?.subscribe(`/topic/${state.url}`, function (message) {
           if (Number(message.body) === 0) {
-            console.log(message.body);
             setLoading(false);
           }
         });
       },
-      function (error: string) {
-        // 연결이 실패하면 실행되는 콜백
+      (error: string) => {
         console.log('STOMP Error: ' + error);
+        setTimeout(connectSocket, 3000);
       },
     );
+  };
 
-    // 컴포넌트가 언마운트될 때 STOMP 클라이언트 연결 종료
+  useEffect(() => {
+    connectSocket();
+
     return () => {
       if (stompClient !== null) {
         stompClient.disconnect();
@@ -126,6 +131,7 @@ const DeliverPaperPage: React.FC = () => {
           text: textProperties.text,
           fontFamily: textProperties.fontFamily,
           fontSize: 12,
+          align: 'center',
         });
         return text;
       }),
@@ -224,13 +230,13 @@ const DeliverPaperPage: React.FC = () => {
   }, [texts, loading]);
 
   return (
-    <Container $paddingtop={16}>
-      <Logo />
+    <Container $paddingtop={0}>
       <TextSpace id="image">
+        <Logo />
         <NameSpace>
           <p>{state.roomName}</p>
-          <span style={{ float: 'left' }}>To.</span>
-          <span>{state.userName}</span>
+          <span style={{ float: 'left', marginLeft: 10 }}>To.</span>
+          <span style={{ marginRight: 10 }}>{state.userName}</span>
           <hr />
         </NameSpace>
         <div id="container">
@@ -294,13 +300,14 @@ const DeliverPaperPage: React.FC = () => {
 export default DeliverPaperPage;
 
 const TextSpace = styled.div`
+  padding-top: 16px;
   width: 390px;
   background-color: var(--Bg_color);
 `;
 
 const NameSpace = styled.div`
-  margin-top: 24px;
-  width: 195px;
+  margin-top: 18px;
+  width: 190px;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
@@ -308,8 +315,8 @@ const NameSpace = styled.div`
   p {
     color: #000;
     opacity: 0.5;
-    font: var(--Bold-Small-font);
-    margin-bottom: 9px;
+    font: var(--Bold-Small-font2);
+    margin-bottom: 13px;
   }
 
   span {
