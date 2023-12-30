@@ -1,0 +1,10 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow:/
+Disallow: /room/
+
+# Host
+Host: https://rollingpaper.netlify.app
+
+# Sitemaps
+Sitemap: https://rollingpaper.netlify.app/sitemap.xml
