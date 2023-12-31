@@ -18,7 +18,7 @@
 <br>
 
 ## 🛠 기술 스택
-> <img src="https://img.shields.io/badge/Typescript-3178C6?style=flat-square&logo=Typescript&logoColor=white"/> <img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=React&logoColor=white"/> <img src="https://img.shields.io/badge/Styled Components-DB7093?style=flat-square&logo=styled-components&logoColor=white"/> <img src="https://img.shields.io/badge/Konva-0E83CD?style=flat-square&logo=Konva&logoColor=white"/>
+> <img src="https://img.shields.io/badge/Typescript-3178C6?style=flat-square&logo=Typescript&logoColor=white"/> <img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=React&logoColor=white"/> <img src="https://img.shields.io/badge/Styled Components-DB7093?style=flat-square&logo=styled-components&logoColor=white"/> <img src="https://img.shields.io/badge/Konva-0E83CD?style=flat-square&logo=Konva&logoColor=white"/> <img src="https://img.shields.io/badge/SockJS-2C5BB4?style=flat-square"/> <img src="https://img.shields.io/badge/StompJS-6DA252?style=flat-square"/>
 <br>
 
 ## 📃 Commit Message Convention
