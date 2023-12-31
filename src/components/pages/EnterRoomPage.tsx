@@ -80,7 +80,7 @@ const EnterRoomPage: React.FC = () => {
   return (
     <Container $paddingtop={16}>
       <Logo />
-      <DetailContainer $margintop={185} $marginBottom={259}>
+      <DetailContainer $margintop={185} $marginBottom={211}>
         <Text>
           롤링페이퍼 방에서 사용할 이름을 설정해 주세요
           <br />
@@ -141,7 +141,7 @@ const TextBtnDiv = styled.div`
   p {
     color: var(--contents-content);
     font: var(--paragraph-Medium-font);
-    margin-bottom: 5px;
+    margin-bottom: 8px;
   }
 `;
 
