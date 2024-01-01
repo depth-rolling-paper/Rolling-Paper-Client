@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Konva from 'konva';
 import { Stage, Layer, Image } from 'react-konva';
 import { Container, Button } from '../../App.style';
-import { ReactComponent as Logo } from '../../images/Rolling_Paper_Classic_S.svg';
+import Logo from '../../images/Rolling_Paper_Classic.png';
 import styled from 'styled-components';
 import ShareImgBtn from '../common/shareSNS/ShareImgBtn';
 import Toast from '../common/Toast';
@@ -232,7 +232,7 @@ const DeliverPaperPage: React.FC = () => {
   return (
     <Container $paddingtop={0}>
       <TextSpace id="image">
-        <Logo />
+        <img src={Logo} alt="롤링페이퍼" width={105} height={65} />
         <NameSpace>
           <p>{state.roomName}</p>
           <span style={{ float: 'left', marginLeft: 10 }}>To.</span>
