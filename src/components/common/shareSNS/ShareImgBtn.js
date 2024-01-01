@@ -5,6 +5,8 @@ import { Button } from '../../../App.style';
 const ShareImgBtn = ({ setToastState, setModalState, setIsModalOpen }) => {
   const onCapture = () => {
     html2canvas(document.getElementById('image'), {
+      useCORS: true,
+      allowTaint: false,
       backgroundColor: '#F9F5EB',
     })
       .then(canvas => {
